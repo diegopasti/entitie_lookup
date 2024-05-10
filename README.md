@@ -1,2 +1,2 @@
-# people_lookup
-Web service for consulting data from people registered on the platform
+# Entities lookup
+Web service for consulting data from people and companies registered on the platform
