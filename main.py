@@ -5,13 +5,17 @@ from conf.middlewares import ProcessTimeHeader
 from conf.settings import ALLOWED_HOSTS
 
 app = FastAPI()
-app.add_middleware(ProcessTimeHeader)
 app.add_middleware(TrustedHostMiddleware, allowed_hosts=ALLOWED_HOSTS)
+app.add_middleware(ProcessTimeHeader)
 
 
 @app.get("/")
-async def root():
-    return {"message": "Hello World"}
+def root():
+    return {
+        "result": True,
+        "message": "Object sucessfully returned",
+        "object": {}
+    }
 
 
 if __name__ == "__main__":
