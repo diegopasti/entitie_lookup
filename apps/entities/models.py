@@ -7,14 +7,13 @@ from apps.documents.models import Activity, Document
 class Entity(BaseModel):
 
     name: str
-    popular_name: str
-    nationality: str
-    documents: str
-    birth_foundation: str
-    documents: Optional[Document] = []
+    popular_name: Optional[str] = None
+    nationality: Optional[str] = None
+    birth_foundation: Optional[str] = None
+    documents: Optional[Document] = None
 
 
-class People(Entity):
+class Person(Entity):
 
     profession: Optional[str] = None
     mother_name: Optional[str] = None
