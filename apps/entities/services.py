@@ -1,4 +1,4 @@
-from apps.entities.models import Person
+from apps.entities.schemas import Person
 from apps.entities.utils import create_generic_entity
 
 

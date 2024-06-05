@@ -25,7 +25,7 @@ def root():
     }
 
 
-@app.get("/person/")
+@app.get("/person/", status_code=HTTPStatus.OK)
 async def filter(query: dict | None = None):
 
     if query is None:
@@ -38,7 +38,7 @@ async def filter(query: dict | None = None):
         raise HTTPException(status_code=403, detail="Invalid identifier")
 
 
-@app.get("/person/{oid}")
+@app.get("/person/{oid}", status_code=HTTPStatus.OK)
 async def person(oid):
     try:
         return PersonController().object(oid)
@@ -52,7 +52,7 @@ async def insert(data: Person):
     return PersonController().insert(data.dict())
 
 
-@app.put("/person/{oid}")
+@app.put("/person/{oid}", status_code=HTTPStatus.CREATED)
 async def update(oid: str, data: dict):
     try:
         return PersonController().update(oid, data)
@@ -61,7 +61,7 @@ async def update(oid: str, data: dict):
         raise HTTPException(status_code=403, detail="Invalid identifier")
 
 
-@app.delete("/person/{oid}")
+@app.delete("/person/{oid}", status_code=HTTPStatus.NO_CONTENT)
 async def delete(oid: str):
     try:
         deleted = PersonController().delete(oid)

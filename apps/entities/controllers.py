@@ -8,17 +8,6 @@ class PersonController:
         self.mongo = Mongo("entity-lookup")
         self.mongo.use_collection("entities")
 
-    """def all(self):
-        ""
-        Returns all saved records or an empty list if there are no records
-
-        returns:
-            List with saved records or empty list
-        ""
-
-        return self.search(query={})
-        """
-
     def object(self, oid: str):
         """
         Search Person in the database using oid.
@@ -49,7 +38,7 @@ class PersonController:
         returns:
             Document with oid provided or none if it does not exist
         """
-        #return self.search(query=query)
+
         cursor = self.mongo.filter(query, exclude, sort, limit)
         return [Person(**item) for item in cursor]
 
