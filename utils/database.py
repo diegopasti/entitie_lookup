@@ -170,15 +170,15 @@ class Mongo(Database):
         new_values = {"$set": data}
         return self.collection.find_one_and_update({"_id": ObjectId(oid)}, new_values)
 
-    def delete(self, oid: str):
+    def delete(self, query: dict):
         """
         Delete an object's data in the database
 
         Parameters:
-            oid: Identifier of the object to be changed
+            query: Identifier of the objects to be deleted
 
         returns:
             result of the operation, true if deleted successfully or false
         """
 
-        return self.collection.delete_one({"_id": ObjectId(oid)})
+        return self.collection.delete_many(query)

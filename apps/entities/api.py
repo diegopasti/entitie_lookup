@@ -47,10 +47,10 @@ async def update(oid: str, data: dict):
         raise HTTPException(status_code=403, detail="Invalid identifier")
 
 
-@router.delete("/person/{oid}", status_code=HTTPStatus.NO_CONTENT)
-async def delete(oid: str):
+@router.delete("/person/", status_code=HTTPStatus.NO_CONTENT)
+async def delete(query: dict):
     try:
-        deleted = PersonController().delete(oid)
+        deleted = PersonController().delete(query)
 
         return {
             "result": True,

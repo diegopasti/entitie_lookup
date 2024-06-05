@@ -79,15 +79,15 @@ class PersonController:
         except TypeError:
             return None
 
-    def delete(self, oid: str):
+    def delete(self, query: dict):
         """
-        Delete document in the database using object oid.
+        Delete documents in the database using query parameters.
 
         Parameters:
-            oid: Identifier of the object to be changed
+            query: Identifier of the objects to be deleted
 
         returns:
             Number of objects deleted, zero if there is no object with this oid
         """
 
-        return self.mongo.delete(oid).deleted_count
+        return self.mongo.delete(query).deleted_count
