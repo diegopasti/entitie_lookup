@@ -117,7 +117,7 @@ class Mongo(Database):
 
         return self.collection.find_one({"_id": ObjectId(oid)})
 
-    def search(self, query=dict, exclude: dict | None = None, sort: list | None = None, limit: int = 0):
+    def filter(self, query=dict, exclude: dict | None = None, sort: list | None = None, limit: int = 0):
         """
         Search objects in the database using fields and values in a dictionary format.
         If the dictionary is empty, the complete list is returned.
