@@ -42,46 +42,44 @@ class PersonController:
         cursor = self.mongo.filter(query, exclude, sort, limit)
         return [Person(**item) for item in cursor]
 
-    def update(self, oid: str, data: dict):
+    def update(self, query: dict, data: dict):
         """
-        Search document in the database using object oid.
-        If the dictionary is empty, the complete list is returned.
+        Updates one or more objects that meet the parameters sought with the values entered,
+        Either by id or any other field that exists in the model.
 
         Parameters:
-            oid: Dictionary with fields used for consultation
+            query: A query that matches the documents to update
             data: Dictionary with new values
 
         returns:
-            Person updated or none if it does not exist
+            List of Person updated or none if it does not exist
         """
 
         try:
-            return Person(**self.mongo.update(oid, data))
+            updated = self.mongo.update(query, data)
+            print("VEJA O QUE VEIO:",updated, type(updated), dir(updated))
+            print("VEJA:", updated.inserted_ids)
+            return Person(**self.mongo.update(query, data))
 
         except TypeError:
             return None
 
-    def insert(self, data: dict):
+    def insert(self, data: list):
         """
-        Create a new Person into database
+        Create one or more Person into database
 
         Parameters:
-            data: Dictionary with object data
+            data: List containing one or more Dictionary with data object
 
         returns:
             Person object saved in the database or None
         """
 
-        try:
-            new_person_oid = str(self.mongo.insert(data).inserted_id)
-            return self.object(new_person_oid)
-
-        except TypeError:
-            return None
+        return [self.object(oid) for oid in self.mongo.insert(data).inserted_ids]
 
     def delete(self, query: dict):
         """
-        Delete documents in the database using query parameters.
+        Delete one or more documents in the database using query parameters.
 
         Parameters:
             query: Identifier of the objects to be deleted

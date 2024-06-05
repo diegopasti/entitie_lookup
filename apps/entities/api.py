@@ -1,4 +1,5 @@
 from http import HTTPStatus
+from typing import List
 
 from bson.errors import InvalidId
 from fastapi import HTTPException
@@ -34,14 +35,19 @@ async def person(oid):
 
 
 @router.post("/person/", status_code=HTTPStatus.CREATED)
-async def insert(data: Person):
-    return PersonController().insert(data.dict())
+async def insert(data: List[Person]):
+    print("VAMOS INSERIR MULTIPLAS PESSOAS:", data)
+    response = PersonController().insert(data)
+    print("VEJA A RESPOSTA", response)
+    return response
 
 
-@router.put("/person/{oid}", status_code=HTTPStatus.CREATED)
-async def update(oid: str, data: dict):
+@router.put("/person/", status_code=HTTPStatus.CREATED)
+async def update(query: dict, data: dict):
     try:
-        return PersonController().update(oid, data)
+        updated = PersonController().update(query, data)
+        print("VEJA O QUE TEM UPDATED:", updated)
+        return updated
 
     except InvalidId:
         raise HTTPException(status_code=403, detail="Invalid identifier")

@@ -142,7 +142,7 @@ class Mongo(Database):
 
         return self.collection.find(query, **args)
 
-    def insert(self, data: dict):
+    def insert(self, data: list):
         """
         Create a new object into database
 
@@ -153,22 +153,29 @@ class Mongo(Database):
             oid of saved object saved in the database
         """
 
-        return self.collection.insert_one(data)
+        data = [item.dict() for item in data]
+        return self.collection.insert_many(data)
 
-    def update(self, oid: str, data: dict):
+    def update(self, query: dict, data: dict):
         """
         Updates an object's data in the database
 
         Parameters:
-            oid: Identifier of the object to be changed
+            query: Identifier of the objects to be changed
             data: Dictionary with object data
 
         returns:
             result of the operation, true if changed successfully or false
         """
 
+        if "_id" in query:
+            query["_id"] = ObjectId(query["_id"])
+
+        elif "id" in query:
+            query["_id"] = ObjectId(query["id"])
+
         new_values = {"$set": data}
-        return self.collection.find_one_and_update({"_id": ObjectId(oid)}, new_values)
+        return self.collection.update_many(query, new_values)
 
     def delete(self, query: dict):
         """
