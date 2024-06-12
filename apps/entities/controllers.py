@@ -1,4 +1,5 @@
 from apps.entities.schemas import Person
+from apps.entities.utils import create_generic_entity
 from utils.database import Mongo
 
 
@@ -56,9 +57,6 @@ class PersonController:
         """
 
         try:
-            updated = self.mongo.update(query, data)
-            print("VEJA O QUE VEIO:",updated, type(updated), dir(updated))
-            print("VEJA:", updated.inserted_ids)
             return Person(**self.mongo.update(query, data))
 
         except TypeError:
@@ -89,3 +87,14 @@ class PersonController:
         """
 
         return self.mongo.delete(query).deleted_count
+
+    def generate(self, quant: int = 1):
+        """
+        Create one or more new random entity(s).
+
+        :param quant: Quantity of new objects, default is 1.
+
+        return: List of created objects
+        """
+
+        return self.insert([create_generic_entity() for item in range(quant)])

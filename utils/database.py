@@ -153,7 +153,7 @@ class Mongo(Database):
             oid of saved object saved in the database
         """
 
-        data = [item.dict() for item in data]
+        data = [item for item in data]
         return self.collection.insert_many(data)
 
     def update(self, query: dict, data: dict):

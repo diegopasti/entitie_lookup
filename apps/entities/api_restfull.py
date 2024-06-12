@@ -14,6 +14,13 @@ router = APIRouter()
 
 @router.get(path="/person/", status_code=HTTPStatus.OK)
 async def filter(query: dict | None = None):
+    """
+    Returns records of people that meet the specified parameters or all records if no query is provided.
+
+    :param query: Optional dictionary containing the fields and values that will be used in the query
+
+    return: List of records that have the searched parameters, or empty list if there are no records that match
+    """
 
     if query is None:
         query = {}
@@ -26,7 +33,15 @@ async def filter(query: dict | None = None):
 
 
 @router.get("/person/{oid}", status_code=HTTPStatus.OK)
-async def person(oid):
+async def object(oid: str):
+    """
+    Returns a dictionary containing the data of the searched record or empty if
+    there are no records with the given identifier.
+
+    :param oid: ObjectID of the record that will be searched
+
+    return: Dictionary with record data or empty
+    """
     try:
         return PersonController().object(oid)
 
@@ -36,18 +51,21 @@ async def person(oid):
 
 @router.post("/person/", status_code=HTTPStatus.CREATED)
 async def insert(data: List[Person]):
-    print("VAMOS INSERIR MULTIPLAS PESSOAS:", data)
+    """
+    Return a dictionary list containing the inserted records.
+
+    :param data: ObjectID of the record that will be searched
+
+    return: Dictionary with record data or empty
+    """
     response = PersonController().insert(data)
-    print("VEJA A RESPOSTA", response)
     return response
 
 
 @router.put("/person/", status_code=HTTPStatus.CREATED)
 async def update(query: dict, data: dict):
     try:
-        updated = PersonController().update(query, data)
-        print("VEJA O QUE TEM UPDATED:", updated)
-        return updated
+        return PersonController().update(query, data)
 
     except InvalidId:
         raise HTTPException(status_code=403, detail="Invalid identifier")
@@ -66,3 +84,16 @@ async def delete(query: dict):
 
     except InvalidId:
         raise HTTPException(status_code=404, detail="Invalid identifier")
+
+
+@router.get(path="/generate/", status_code=HTTPStatus.OK)
+async def generate(quant: int = 1):
+    """
+    Create one or more new random entity(s).
+
+    :param quant: Quantity of new objects, default is 1.
+
+    return: List of created objects
+    """
+
+    return PersonController().generate(quant)
