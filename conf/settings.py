@@ -1,11 +1,15 @@
+import json
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 BASE_DIR = os.path.dirname(os.path.dirname(__file__))
-ALLOWED_HOSTS = ["127.0.0.1"]
+ALLOWED_HOSTS = json.loads(os.getenv("ALLOWED_HOSTS"))
 
-MONGODB_URL = "mongodb://localhost:27017/" #"mongodb+srv://diegopasti:P8HBWl0FU3lS5PfI@entitylookup.zafw6lg.mongodb.net/?retryWrites=true&w=majority&appName=EntityLookup"
-REDIS_URL = "redis://default:YOMUfqOnjACxBtaml3sUwDkt6b5VYUXi@redis-11711.c239.us-east-1-2.ec2.redns.redis-cloud.com:11711"
-REDIS_HOST = "redis-11711.c239.us-east-1-2.ec2.redns.redis-cloud.com"
-REDIS_PORT = 11711
-REDIS_USER = "default"
-REDIS_PASS = "YOMUfqOnjACxBtaml3sUwDkt6b5VYUXi"
+MONGODB_URL = os.getenv("MONGODB_URL")
+REDIS_URL = os.getenv("REDIS_URL")
+REDIS_HOST = os.getenv("REDIS_HOST")
+REDIS_PORT = os.getenv("REDIS_PORT")
+REDIS_USER = os.getenv("REDIS_USER")
+REDIS_PASS = os.getenv("REDIS_PASS")
