@@ -1,3 +1,6 @@
+import redis
+from redis import Redis
+
 from apps.entities.schemas import Person
 from apps.entities.utils import create_generic_entity
 from utils.database import Mongo
@@ -5,6 +8,7 @@ from utils.database import Mongo
 
 class PersonController:
 
+    model = Person
     def __init__(self):
         self.mongo = Mongo("entity-lookup")
         self.mongo.use_collection("entities")
@@ -25,7 +29,9 @@ class PersonController:
         except TypeError:
             return None
 
-    def filter(self, query: dict, exclude: dict | None = None, sort: list | None = None, limit: int = 0):
+    def filter(self, query: dict, exclude: dict | None = None, sort: list | None = None, limit: int = 0,
+               format: bool = True
+               ):
         """
         Search document in the database using object oid.
         If the dictionary is empty, the complete list is returned.
@@ -35,13 +41,18 @@ class PersonController:
             exclude: Dictionary with fields that will not be returned
             sort: List with tuples, ex: sort=[("name", pymongo.DESCENDING), ("age", pymongo.ASCENDING)]
             limit: Limit results, default zero for unlimited
+            format: Object representation than will be returned,
 
         returns:
             Document with oid provided or none if it does not exist
         """
-
         cursor = self.mongo.filter(query, exclude, sort, limit)
-        return [Person(**item) for item in cursor]
+        if format:
+            return [self.model(**item) for item in cursor], cursor
+
+        return [item for item in cursor]
+
+
 
     def update(self, query: dict, data: dict):
         """

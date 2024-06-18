@@ -1,32 +1,54 @@
+import json
+
 from http import HTTPStatus
 from typing import List
 
 from bson.errors import InvalidId
-from fastapi import HTTPException
-from fastapi import APIRouter
+from fastapi import HTTPException, APIRouter, Request
+from fastapi_cache import FastAPICache
+from starlette.responses import JSONResponse
 
 from apps.entities.controllers import PersonController
-from apps.entities.schemas import Person
-
+from utils.caches import custom_key_builder
 
 router = APIRouter()
 
 
-@router.get(path="/person/", status_code=HTTPStatus.OK)
-async def filter(query: dict | None = None):
+@router.get(path="/person", status_code=HTTPStatus.OK)
+async def filter(query: dict | None = None,  request: Request = None):
     """
     Returns records of people that meet the specified parameters or all records if no query is provided.
 
     :param query: Optional dictionary containing the fields and values that will be used in the query
 
+    :param request: Request properties
+
     return: List of records that have the searched parameters, or empty list if there are no records that match
     """
+
+    redis = FastAPICache.get_backend()
+    key = custom_key_builder(filter, request=request, namespace="entities", kwargs=query)
+    cache_control = request.headers.get("Cache-Control")
+    headers = {"Cache-Control": "max-age=3600"}
+
+    if cache_control != "no-cache":
+        cached = await redis.get(key)
+
+        if cached:
+            return JSONResponse(content=json.loads(cached), headers=headers)
 
     if query is None:
         query = {}
 
     try:
-        return PersonController().filter(query)
+        response = PersonController().filter(query, format=False)
+        data = json.dumps(response, default=str)
+
+        if cache_control != "no-cache":
+            one_hour = 60 * 60
+            await redis.set(key, data, expire=one_hour)
+
+        return JSONResponse(content=json.loads(data), headers=headers)
 
     except InvalidId:
         raise HTTPException(status_code=403, detail="Invalid identifier")
@@ -42,6 +64,7 @@ async def object(oid: str):
 
     return: Dictionary with record data or empty
     """
+
     try:
         return PersonController().object(oid)
 
@@ -50,7 +73,7 @@ async def object(oid: str):
 
 
 @router.post("/person/", status_code=HTTPStatus.CREATED)
-async def insert(data: List[Person]):
+async def insert(data: List[dict]):
     """
     Return a dictionary list containing the inserted records.
 
@@ -97,3 +120,4 @@ async def generate(quant: int = 1):
     """
 
     return PersonController().generate(quant)
+
