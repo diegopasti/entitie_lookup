@@ -1,4 +1,5 @@
 from apps.entities.controllers import PersonController
+from apps.entities.queries import PersonQueries
 from apps.entities.schemas import Person
 from apps.entities.utils import create_generic_entity
 
@@ -7,6 +8,7 @@ class PersonServices:
 
     def __init__(self):
         self.controller = PersonController()
+        self.queries = PersonQueries
 
     def create_person(self, data):
         pass
@@ -50,7 +52,7 @@ class PersonServices:
 
         return self.controller.filter({"name": name})
 
-    def filter_entity_are_father(self) -> list:
+    def filter_adults_who_are_father(self):
         """
         Filter entities in the database that are father.
 
@@ -58,7 +60,7 @@ class PersonServices:
             List of parents registered in the system
         """
 
-        return self.controller.filter({"children": 1})
+        return self.controller.filter(self.queries.person_who_are_adults | self.queries.person_who_are_father)
 
     def filter_people(self, query):
         pass

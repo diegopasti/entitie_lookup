@@ -114,6 +114,21 @@ async def delete(query: dict):
         raise HTTPException(status_code=400, detail="Invalid identifier")
 
 
+@router.get("/api/entities/adults/parents", status_code=HTTPStatus.OK)
+async def get_entities_who_adults_and_parents():
+    """
+    Returns entities who are person, adult and parent.
+
+    return: List of entities
+    """
+
+    try:
+        return PersonServices().filter_adults_who_are_father()
+
+    except Exception as exception:
+        raise HTTPException(status_code=400, detail=str(exception))
+
+
 @router.get(path="/api/entities/generate/", status_code=HTTPStatus.OK)
 async def generate(quant: int = 1):
     """

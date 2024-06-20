@@ -1,6 +1,7 @@
 import logging
 
 from bson import ObjectId
+from bson.errors import InvalidId
 from pymongo import MongoClient
 from pymongo.errors import ConnectionFailure
 
@@ -117,6 +118,7 @@ class Mongo(Database):
 
         return self.collection.find_one({"_id": ObjectId(oid)})
 
+
     def filter(self, query: dict = dict, exclude: dict | None = None, sort: list | None = None, limit: int = 0):
         """
         Search objects in the database using fields and values in a dictionary format.
@@ -142,7 +144,7 @@ class Mongo(Database):
 
         return self.collection.find(query, **args)
 
-    def insert(self, data: list):
+    def insert(self, data: list | dict):
         """
         Create a new object into database
 
@@ -152,9 +154,11 @@ class Mongo(Database):
         returns:
             oid of saved object saved in the database
         """
+        if isinstance(data, list):
+            data = [item for item in data]
+            return self.collection.insert_many(data)
 
-        data = [item for item in data]
-        return self.collection.insert_many(data)
+        return self.collection.insert_one(data)
 
     def update(self, query: dict, data: dict):
         """

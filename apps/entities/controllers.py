@@ -69,7 +69,7 @@ class PersonController:
         """
         cursor = self.mongo.filter(query, exclude, sort, limit)
         if format:
-            return [self.model(**item) for item in cursor], cursor
+            return [self.model(**item) for item in cursor]
 
         return [item for item in cursor]
 
