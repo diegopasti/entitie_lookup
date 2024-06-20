@@ -103,8 +103,7 @@ class PersonController:
             Person object saved in the database or None
         """
         if isinstance(data, list):
-            items = [self.object(oid) for oid in self.mongo.insert(data).inserted_ids]
-            return items
+            return [self.object(oid) for oid in self.mongo.insert(data).inserted_ids]
         return self.object(self.mongo.insert(data).inserted_id)
 
     def delete(self, query: dict):

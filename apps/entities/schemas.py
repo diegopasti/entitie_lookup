@@ -1,3 +1,4 @@
+from bson import ObjectId
 from pydantic import BaseModel
 from typing import Optional, List
 
@@ -5,6 +6,7 @@ from apps.documents.models import Activity, Document
 
 
 class Entity(BaseModel):
+    _id: ObjectId
     identifier: str
     name: str
     popular_name: Optional[str] = None

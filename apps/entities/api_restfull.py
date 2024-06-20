@@ -73,7 +73,7 @@ async def object(oid: str):
         raise HTTPException(status_code=400, detail=str(exception))
 
 
-@router.post("/api/entities/person/", status_code=HTTPStatus.CREATED)
+@router.post("/api/entities/person", status_code=HTTPStatus.CREATED)
 async def insert(data: List[dict] | dict):
     """
     Return a dictionary list containing the inserted records.
@@ -90,7 +90,7 @@ async def insert(data: List[dict] | dict):
         raise HTTPException(status_code=400, detail=str(exception))
 
 
-@router.put("/api/entities/person/", status_code=HTTPStatus.CREATED)
+@router.put("/api/entities/person", status_code=HTTPStatus.CREATED)
 async def update(query: dict, data: dict):
     try:
         return PersonController().update(query, data)
@@ -99,7 +99,7 @@ async def update(query: dict, data: dict):
         raise HTTPException(status_code=403, detail="Invalid identifier")
 
 
-@router.delete("/api/entities/person/", status_code=HTTPStatus.NO_CONTENT)
+@router.delete("/api/entities/person", status_code=HTTPStatus.NO_CONTENT)
 async def delete(query: dict):
     try:
         deleted = PersonController().delete(query)
@@ -129,7 +129,7 @@ async def get_entities_who_adults_and_parents():
         raise HTTPException(status_code=400, detail=str(exception))
 
 
-@router.get(path="/api/entities/generate/", status_code=HTTPStatus.OK)
+@router.get(path="/api/entities/generate", status_code=HTTPStatus.OK)
 async def generate(quant: int = 1):
     """
     Create one or more new random entity(s).
