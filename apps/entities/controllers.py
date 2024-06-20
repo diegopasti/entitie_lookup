@@ -1,6 +1,11 @@
+import json
+
 import redis
+from bson.errors import InvalidId
+from pydantic import ValidationError
 from redis import Redis
 
+from apps.entities.exceptions import EntityDoesNotExist, InvalidEntity, InvalidObjectID
 from apps.entities.schemas import Person
 from apps.entities.utils import create_generic_entity
 from utils.database import Mongo
@@ -87,7 +92,7 @@ class PersonController:
         except TypeError:
             return None
 
-    def insert(self, data: list):
+    def insert(self, data: list | dict):
         """
         Create one or more Person into database
 
@@ -99,11 +104,7 @@ class PersonController:
         """
         if isinstance(data, list):
             items = [self.object(oid) for oid in self.mongo.insert(data).inserted_ids]
-            print("VEJA OS ITENS", items)
             return items
-        item = self.object(self.mongo.insert(data).inserted_id)
-        print("VEJA O ITEM", item)
-
         return self.object(self.mongo.insert(data).inserted_id)
 
     def delete(self, query: dict):

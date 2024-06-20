@@ -9,12 +9,13 @@ from fastapi_cache import FastAPICache
 from starlette.responses import JSONResponse
 
 from apps.entities.controllers import PersonController
+from apps.entities.services import PersonServices
 from utils.caches import custom_key_builder
 
 router = APIRouter()
 
 
-@router.get(path="/person", status_code=HTTPStatus.OK)
+@router.get(path="/api/entities/person", status_code=HTTPStatus.OK)
 async def filter(query: dict | None = None,  request: Request = None):
     """
     Returns records of people that meet the specified parameters or all records if no query is provided.
@@ -51,7 +52,7 @@ async def filter(query: dict | None = None,  request: Request = None):
         return JSONResponse(content=json.loads(data), headers=headers)
 
     except InvalidId:
-        raise HTTPException(status_code=403, detail="Invalid identifier")
+        raise HTTPException(status_code=400, detail="Invalid identifier")
 
 
 @router.get("/api/entities/person/{oid}", status_code=HTTPStatus.OK)
@@ -66,14 +67,14 @@ async def object(oid: str):
     """
 
     try:
-        return PersonController().object(oid)
+        return PersonServices().get_entity(oid)
 
     except Exception as exception:
         raise HTTPException(status_code=400, detail=str(exception))
 
 
-@router.post("/person/", status_code=HTTPStatus.CREATED)
-async def insert(data: List[dict]):
+@router.post("/api/entities/person/", status_code=HTTPStatus.CREATED)
+async def insert(data: List[dict] | dict):
     """
     Return a dictionary list containing the inserted records.
 
@@ -81,11 +82,15 @@ async def insert(data: List[dict]):
 
     return: Dictionary with record data or empty
     """
-    response = PersonController().insert(data)
-    return response
+
+    try:
+        return PersonController().insert(data)
+
+    except Exception as exception:
+        raise HTTPException(status_code=400, detail=str(exception))
 
 
-@router.put("/person/", status_code=HTTPStatus.CREATED)
+@router.put("/api/entities/person/", status_code=HTTPStatus.CREATED)
 async def update(query: dict, data: dict):
     try:
         return PersonController().update(query, data)
@@ -94,7 +99,7 @@ async def update(query: dict, data: dict):
         raise HTTPException(status_code=403, detail="Invalid identifier")
 
 
-@router.delete("/person/", status_code=HTTPStatus.NO_CONTENT)
+@router.delete("/api/entities/person/", status_code=HTTPStatus.NO_CONTENT)
 async def delete(query: dict):
     try:
         deleted = PersonController().delete(query)
@@ -106,10 +111,10 @@ async def delete(query: dict):
         }
 
     except InvalidId:
-        raise HTTPException(status_code=404, detail="Invalid identifier")
+        raise HTTPException(status_code=400, detail="Invalid identifier")
 
 
-@router.get(path="/generate/", status_code=HTTPStatus.OK)
+@router.get(path="/api/entities/generate/", status_code=HTTPStatus.OK)
 async def generate(quant: int = 1):
     """
     Create one or more new random entity(s).
