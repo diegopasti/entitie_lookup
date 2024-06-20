@@ -9,6 +9,7 @@ from utils.database import Mongo
 class PersonController:
 
     model = Person
+
     def __init__(self):
         self.mongo = Mongo("entity-lookup")
         self.mongo.use_collection("entities")
@@ -26,12 +27,27 @@ class PersonController:
 
         try:
             return Person(**self.mongo.object(oid))
-        except TypeError:
-            return None
 
-    def filter(self, query: dict, exclude: dict | None = None, sort: list | None = None, limit: int = 0,
-               format: bool = True
-               ):
+        except TypeError:
+            raise EntityDoesNotExist(
+                message="Error! Object searched does not exist",
+                errors=[]
+            )
+
+        except InvalidId as exception:
+            raise InvalidObjectID(
+                message="Error! Invalid object identifier",
+                errors=[]
+            )
+
+        except ValidationError as exception:
+            raise InvalidEntity(
+                message="Data returned is not a valid Person",
+                errors=exception.errors()
+            )
+
+    def filter(self, query: dict, exclude: dict | None = None,
+               sort: list | None = None, limit: int = 0, format: bool = True):
         """
         Search document in the database using object oid.
         If the dictionary is empty, the complete list is returned.
@@ -51,8 +67,6 @@ class PersonController:
             return [self.model(**item) for item in cursor], cursor
 
         return [item for item in cursor]
-
-
 
     def update(self, query: dict, data: dict):
         """
@@ -83,8 +97,14 @@ class PersonController:
         returns:
             Person object saved in the database or None
         """
+        if isinstance(data, list):
+            items = [self.object(oid) for oid in self.mongo.insert(data).inserted_ids]
+            print("VEJA OS ITENS", items)
+            return items
+        item = self.object(self.mongo.insert(data).inserted_id)
+        print("VEJA O ITEM", item)
 
-        return [self.object(oid) for oid in self.mongo.insert(data).inserted_ids]
+        return self.object(self.mongo.insert(data).inserted_id)
 
     def delete(self, query: dict):
         """

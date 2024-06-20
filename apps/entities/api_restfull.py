@@ -54,7 +54,7 @@ async def filter(query: dict | None = None,  request: Request = None):
         raise HTTPException(status_code=403, detail="Invalid identifier")
 
 
-@router.get("/person/{oid}", status_code=HTTPStatus.OK)
+@router.get("/api/entities/person/{oid}", status_code=HTTPStatus.OK)
 async def object(oid: str):
     """
     Returns a dictionary containing the data of the searched record or empty if
@@ -68,8 +68,8 @@ async def object(oid: str):
     try:
         return PersonController().object(oid)
 
-    except InvalidId:
-        raise HTTPException(status_code=403, detail="Invalid identifier")
+    except Exception as exception:
+        raise HTTPException(status_code=400, detail=str(exception))
 
 
 @router.post("/person/", status_code=HTTPStatus.CREATED)
