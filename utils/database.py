@@ -117,7 +117,7 @@ class Mongo(Database):
 
         return self.collection.find_one({"_id": ObjectId(oid)})
 
-    def search(self, query=dict, exclude: dict | None = None, sort: list | None = None, limit: int = 0):
+    def filter(self, query: dict = dict, exclude: dict | None = None, sort: list | None = None, limit: int = 0):
         """
         Search objects in the database using fields and values in a dictionary format.
         If the dictionary is empty, the complete list is returned.
@@ -142,7 +142,7 @@ class Mongo(Database):
 
         return self.collection.find(query, **args)
 
-    def insert(self, data):
+    def insert(self, data: list):
         """
         Create a new object into database
 
@@ -153,32 +153,39 @@ class Mongo(Database):
             oid of saved object saved in the database
         """
 
-        return self.collection.insert_one(data.dict())
+        data = [item for item in data]
+        return self.collection.insert_many(data)
 
-    def update(self, oid, data):
+    def update(self, query: dict, data: dict):
         """
         Updates an object's data in the database
 
         Parameters:
-            oid: Identifier of the object to be changed
+            query: Identifier of the objects to be changed
             data: Dictionary with object data
 
         returns:
             result of the operation, true if changed successfully or false
         """
 
-        new_values = {"$set": data}
-        return self.collection.find_one_and_update({"_id": ObjectId(oid)}, new_values)
+        if "_id" in query:
+            query["_id"] = ObjectId(query["_id"])
 
-    def delete(self, oid):
+        elif "id" in query:
+            query["_id"] = ObjectId(query["id"])
+
+        new_values = {"$set": data}
+        return self.collection.update_many(query, new_values)
+
+    def delete(self, query: dict):
         """
         Delete an object's data in the database
 
         Parameters:
-            oid: Identifier of the object to be changed
+            query: Identifier of the objects to be deleted
 
         returns:
             result of the operation, true if deleted successfully or false
         """
 
-        return self.collection.delete_one({"_id": ObjectId(oid)})
+        return self.collection.delete_many(query)
